@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+html, body {
+	margin: 0;
+	padding: 0;
+}
+
+img {
+	background-color: transparent;
+}
+
+#intro {
+	margin: 1em;
+}
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+
+/* Another fine product from Subnet ROOT (https://www.subnetroot.com) */
+/* Why are you even reading this? */
+
+const mark = "131V113";
+
+function onFormChanged() {
+	if ($("#intro").length < 1) return;
+	
+	const imageTotal = $("form input[name='imgtotal']").val();
+	const cellsPerRow = $("form input[name='perrow']").val();
+	const cellWidth = $("form input[name='cellwidth']").val();
+	const cellHeight = $("form input[name='cellheight']").val();
+	
+	$("#intro .result-width").text(Math.min(cellsPerRow, imageTotal) * cellWidth);
+	$("#intro .result-height").text(Math.max(cellHeight, Math.floor(imageTotal / cellsPerRow) * cellHeight));
+}
+$(document).ready(() => {
+	$("form input").on("change", () => { onFormChanged(); });
+	onFormChanged();
+});
+
+function setupInstance() {
+	// set vars from the form
+	const imageTotal = $("form input[name='imgtotal']").val();
+	const cellsPerRow = $("form input[name='perrow']").val();
+	const cellWidth = $("form input[name='cellwidth']").val();
+	const cellHeight = $("form input[name='cellheight']").val();
+	const bgcolor = $("form input[name='bgcolor']").val();
+	
+	// clean up intro elements
+	$("#intro").hide();
+	
+	// set the page background
+	$("body").css("background-color", bgcolor);
+	
+	if (mark === "131V113") addCells(imageTotal, cellsPerRow, cellWidth, cellHeight);
+}
+
+function addCells(imageTotal, cellsPerRow, cellWidth, cellHeight) {
+	let curRowY = 0;
+	for (let i = 1; i <= imageTotal; i++) {
+		if (i % cellsPerRow === 0) curRowY += cellHeight;
+		
+		const newX = ((i-1) % cellsPerRow) * cellWidth;
+		const newY = Math.floor((i-1) / cellsPerRow) * cellHeight;
+		
+		const newCell = $("<img src='./sprays/spray ("+i+").png' />");
+		newCell
+			.css("position", "absolute")
+			.css("width", cellWidth + "px")
+			.css("height", cellHeight + "px");
+		newCell.offset({ top: newY, left: newX });
+		$("body").append(newCell);
+	}
+}
+
+</script>
+</head>
+<body>
+
+<div id="intro">
+	<b>Instructions:</b><br/>
+	<ol>
+		<li>Bulk export your VTF spray files to PNG's (VTFEdit has this feature) and put them in the <i>./sprays/</i> folder,</li>
+		<li>Rename images to <i>spray (#).png</i> starting at 1,</li>
+		<li>Fill out the form and click <i>Go</i>. For best results, image width and height should match,</li>
+		<li>Optional: To save the result, open Chrome DevTools, press <i>CTRL + SHIFT + P</i>, type <i>&gt;full size screenshot</i>, and select the resulting command. Your collage is now in your Downloads folder.</li>
+	</ol>
+	<p/>
+		Your current settings will result in an image with dimensions <b><span class="result-width"></span>X<span class="result-height"></span></b>.
+	<p/>
+	<form>
+		<label for="imgtotal">Image Total:&nbsp;</label><input type="number" name="imgtotal" value="100"/><br/>
+		<label for="perrow">Images Per Row:&nbsp;</label><input type="number" name="perrow" value="50"/><br/>
+		<label for="cellwidth">Image Width:&nbsp;</label><input type="number" name="cellwidth" value="75"/><br/>
+		<label for="cellheight">Image Height:&nbsp;</label><input type="number" name="cellheight" value="75"/><br/>
+		<label for="bgcolor">Background Color:&nbsp;</label><input type="text" name="bgcolor" value="#CCC"/><br/>
+		<button onclick="event.preventDefault(); setupInstance();">Go</button>
+	</form>
+</div>
+
+</body>
+</html>
